@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 
 def load_dtc_data():
-    with open('dtc_results.txt') as f:
+    with open('res/dtc_results.txt') as f:
         dt_train = list()
         dt_test = list()
         dt_depth = list()
@@ -26,7 +26,7 @@ def load_dtc_data():
 
 
 def load_rfc_data():
-    with open('rfc_results.txt') as f:
+    with open('res/rfc_results.txt') as f:
         rf_train = list()
         rf_test = list()
         rf_depth = list()
@@ -140,4 +140,4 @@ def generate_all_visuals(dtdf, rfdf):
     plt.savefig('images/RFC_vs_DTC_Weighted_SQRT.png')
     plt.clf()
 
-    print('\n---------- Generated all visuals (see images folder) ----------')
+    print('---------- Generated all visuals (see images folder) ----------')

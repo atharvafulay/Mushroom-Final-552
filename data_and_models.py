@@ -12,7 +12,7 @@ import analysis
 
 def load_data():
     mushrooms = list()
-    with open('agaricus-lepiota.data') as f:
+    with open('data/agaricus-lepiota.data') as f:
         for line in f:
             mushrooms.append(line.strip().split(','))
 
@@ -29,12 +29,20 @@ def load_data():
     df.reset_index(inplace=True, drop=True)
 
     X = df.loc[:, df.columns != 'edible-posionous']
-    y = df.loc[: , 'edible-posionous']
+    y = df.loc[:, 'edible-posionous']
 
-    try:
-        os.mkdir('images')
-    except FileExistsError:
-        pass
+    dirs = ['images', 'data', 'res']
+
+    for d in dirs:
+        try:
+            os.mkdir(d)
+        except FileExistsError:
+            pass
+
+    dat = ['agaricus-lepiota.data', 'agaricus-lepiota.names']
+    for d in dat:
+        if os.path.isfile(d):
+            os.rename(d, f'data/{d}')
 
     return X, y, list(df.columns)
 
@@ -117,19 +125,19 @@ def tradition_train_test(X, y):
                 res_dtc.append(f'{dtc_train_score}, {dtc_score}, {md}, {mf_file}, {cw_file}\n')
 
     # separating these because it was causing me some issues when I had these within the triple loop above
-    with open('rfc_results.txt', 'w') as f1:
+    with open('res/rfc_results.txt', 'w') as f1:
         f1.write('#train, test, max_depth, max_features, class_weight\n')
 
         for line in res_rfc:
             f1.write(line)
 
-    with open('dtc_results.txt', 'w') as f2:
+    with open('res/dtc_results.txt', 'w') as f2:
         f2.write('#train, test, max_depth, max_features, class_weight\n')
 
         for line in res_dtc:
             f2.write(line)
 
-    print('You can now look for "rfc_results.txt" and "dtc_results.txt". analysis.py will make use of these.')
+    print('You can now look for "rfc_results.txt" and "dtc_results.txt" in the res folder. analysis.py will make use of these.')
 
 
 def generate_optimal_tree(dtc, feat_names):
@@ -137,10 +145,10 @@ def generate_optimal_tree(dtc, feat_names):
 
     tree.export_graphviz(dtc, 'optimal_tree.dot', feature_names=feat_names[1:])
     try:
-        call(['dot', '-Tpng', 'optimal_tree.dot', '-o', 'images/optimal_tree.png', '-Gdpi=60'])
+        call(['dolt', '-Tpng', 'optimal_tree.dolt', '-o', 'images/optimal_tree.png', '-Gdpi=60'])
         os.remove("optimal_tree.dot")
     except FileNotFoundError:
-        print('Error with the .dot file made. See below for details. The rest of the program will continue...')
+        print('Error with the .dot file. See below for details. The rest of the program will continue...')
         print('     ...This is a known issue with graphviz. You may have to install it using homebrew, '
               '"brew install graphviz", or a solution from the link below.')
         print('     ...See here for more details: https://github.com/WillKoehrsen/Data-Analysis/issues/36'
@@ -178,7 +186,7 @@ def generate_feat_imp_visuals(X, y, columns):
 
 
 def generate_conf_matrix(X, y):
-    print('\n---------- Confusion matrices for optimal DTC and RFC ----------')
+    print('\n---------- Confusion matrices for DTC and RFC ----------')
 
     # note: the reason for using sqrt (for comparison purposes) is that with None, both models
     # return identical results
@@ -239,9 +247,10 @@ if __name__ == '__main__':
     generate_feat_imp_visuals(X, y, feat_names)
     generate_conf_matrix(X, y)
     print('\n---------- End data_and_models.py ----------')
-    print('\n---------- Calling analysis.py ----------')
+
+    print('---------- Calling analysis.py ----------')
     dtdf = analysis.load_dtc_data()
     rfdf = analysis.load_rfc_data()
     analysis.generate_all_visuals(dtdf, rfdf)
-    print('\n---------- End analysis.py ----------')
-    print('\n---------- End ----------')
+    print('---------- End analysis.py ----------')
+    print('---------- End ----------')
