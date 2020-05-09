@@ -149,9 +149,15 @@ def generate_optimal_tree(dtc, feat_names):
         print('Check the images folder for "optimal_tree.png".')
 
 
-def generate_feat_imp_visuals(rfc, columns):
+def generate_feat_imp_visuals(X, y, columns):
+
+    train_X = X.loc[:5999]
+    train_y = y.loc[:5999]
+    rfc = RandomForestClassifier(n_jobs=-1, criterion='entropy', class_weight={0: 1, 1: 100})
+    rfc.fit(train_X, train_y)
+
     print('\n---------- Generating Optimal RFC Feature Importances Visual ----------')
-    combined = zip(rfc.feature_importances_, columns)
+    combined = zip(rfc.feature_importances_, columns[1:])
     combined = sorted(list(combined), reverse=True)
 
     sorted_feature_imps = list()
@@ -161,10 +167,12 @@ def generate_feat_imp_visuals(rfc, columns):
         sorted_feature_imps.append(i[0])
         sorted_cols.append(i[1])
 
+
     plt.bar(sorted_cols, sorted_feature_imps)
     plt.xticks(rotation=90)
     plt.title('Feature Importances on Optimal RFC')
-    plt.savefig('images/feature_importances_optimal_RFC.png')
+    plt.savefig('images/feature_importances_optimal_RFC.png', bbox_inches='tight')
+    plt.clf()
 
     print('Check the images folder for "feature_importances_optimal_RFC.png".')
 
@@ -209,6 +217,8 @@ def generate_conf_matrix(X, y):
 
 
 if __name__ == '__main__':
+    plt.figure(figsize=(6, 8))
+
     X, y, feat_names = load_data()
 
     # optimal random forest classifier
@@ -226,7 +236,7 @@ if __name__ == '__main__':
     k_fold_model_analysis(X, y)
     tradition_train_test(X, y)
     generate_optimal_tree(dtc, feat_names)
-    generate_feat_imp_visuals(rfc, feat_names)
+    generate_feat_imp_visuals(X, y, feat_names)
     generate_conf_matrix(X, y)
     print('\n---------- End data_and_models.py ----------')
     print('\n---------- Calling analysis.py ----------')
