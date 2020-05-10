@@ -151,7 +151,7 @@ def generate_feat_imp_visuals(X, y, columns):
 
     train_X = X.loc[:5999]
     train_y = y.loc[:5999]
-    rfc = RandomForestClassifier(n_jobs=-1, criterion='entropy', class_weight={0: 100, 1:1})
+    rfc = RandomForestClassifier(n_jobs=-1, criterion='entropy', class_weight={0: 100, 1: 1})
     rfc.fit(train_X, train_y)
 
     combined = zip(rfc.feature_importances_, columns[1:])
